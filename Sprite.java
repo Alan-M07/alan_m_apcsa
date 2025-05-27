@@ -1,30 +1,37 @@
 /* Sprite class - to create objects that move around with their own properties
  * Inspired by Daniel Shiffman's p5js Animated Sprite tutorial
  * Note: Picture coordinate origina at top, left corner
- * Author: Joel Bianchi
- * Last Edit: 5/8/25
- * Updated to Java version
+ * Author: Joel Bianchi & Marcus Bistline
+ * Last Edit: 5/22/25
+ * Added jump methods & default gravityStrength
  */
 
 
 import processing.core.PApplet;
 import processing.core.PImage;
-
+ 
 public class Sprite{
 
   public PApplet p;
-  
+
   //------------------ SPRITE FIELDS --------------------//
   private PImage spriteImg;
   private String spriteImgFile;
+  private int color = PColor.NULL;
   private String name;
+  private float w;
+  private float h;
   private float centerX;
   private float centerY;
   private float speedX;
   private float speedY;
-  private float w;
-  private float h;
+  private float accelX;
+  private float accelY;
   private boolean isAnimated;
+  private boolean hasGravity = false;
+  private float defaultGravity = 5.0f;
+  private float gravityStrength = defaultGravity;
+  private float defaultJumpSpeed = 6.0f;
 
 
   //------------------ SPRITE CONSTRUCTORS --------------------//
@@ -40,7 +47,7 @@ public class Sprite{
   }
 
   // Sprite Constructor #3: for Non-Animated Sprite (not working)
-  public Sprite(PApplet p,String spriteImgFile, float scale, float x, float y) {
+  public Sprite(PApplet p, String spriteImgFile, float scale, float x, float y) {
     this(p, spriteImgFile, scale, x, y, false);
   }
 
@@ -56,6 +63,7 @@ public class Sprite{
         this.spriteImg = p.loadImage(spriteImgFile);
         w = spriteImg.width * scale;
         h = spriteImg.height * scale;
+        // System.out.println("Sprite 64: " + spriteImg);
       } else {
 
       }
@@ -67,7 +75,7 @@ public class Sprite{
     this.speedY = 0;
     this.isAnimated = isAnimated;
 
-    // System.out.println("---->Sprite Class 69: "+ Game.toStringPImage(spriteImg));
+    // System.out.println("---->Sprite Class: "+ Game.toStringPImage(spriteImg));
 
   }
 
@@ -87,13 +95,40 @@ public class Sprite{
 
   }
 
+  // Sprite Constructor #6: Blob of color Sprite, used for Platform
+  public Sprite(PApplet p, int color, float posXCenter, float posYTop, float platWidth, float platHeight){
+
+    System.out.println("Sprite: Loading color-blob Sprite!");
+    this.p = p;
+    this.w = platWidth;
+    this.h = platHeight;
+    setCenterX(posXCenter);
+    setTop(posYTop);
+    this.speedX = 0;
+    this.speedY = 0;
+    this.isAnimated = false;
+    this.color = color;
+    System.out.println("done loading Sprite: " + this);
+  }
+
 
   //------------------ SPRITE MOTION METHODS --------------------//
 
   // method to display the Sprite image on the screen
   public void show() {
-    // System.out.println("spriteshow\t" + spriteImg);
-    p.image(spriteImg, getLeft(), getTop(), w, h);
+
+    update();
+
+    // Sprite comes from Image file
+    if(spriteImgFile != null){
+      // System.out.println("\nspriteshow\t" + spriteImg);
+      p.image(spriteImg, getLeft(), getTop(), w, h);
+    }
+
+    // Sprite is just a blob of color
+    else{
+      // System.out.println("spriteshow\tcolor blob");
+    }
   }
 
   // method to move Sprite image on the screen to a specific coordinate
@@ -106,17 +141,81 @@ public class Sprite{
   public void move(float changeX, float changeY){
     this.centerX += changeX;
     this.centerY += changeY;
-    //System.out.println(getLeft() + "," + getTop());
+    // System.out.println(getLeft() + "," + getTop());
   }
 
-  //method to change the speed of the Sprite
-  public void setSpeed( float speedX, float speedY){
+  public void setSpeedX( float speedX){
     this.speedX = speedX;
+  }
+
+  public void setSpeedY( float speedY){
     this.speedY = speedY;
   }
 
+  // Changes the speed of the Sprite
+  public void setSpeed( float speedX, float speedY){
+    setSpeedX(speedX);
+    setSpeedY(speedY);
+  }
 
-  // method to rotate Sprite image on the screen
+  // Gets the speed of the Sprite in the X-direction
+  public float getSpeedX(){
+    return speedX;
+  }
+
+  // Gets the speed of the Sprite in the Y-direction
+  public float getSpeedY(){
+    return speedX;
+  }
+
+  // Change the acceleration of the Sprite in the X-direction
+  public void setAccelerationX(float accelX){
+    this.accelX = accelX;
+  }
+  
+  // Change the acceleration of the Sprite in the Y-direction
+  public void setAccelerationY(float accelY){
+    this.accelY = accelY;
+  }
+
+  // Starts gravity acting on a Sprite at default rate or previously defined rate
+  public void startGravity(){
+    this.hasGravity = true;
+    setAccelerationY(this.gravityStrength);
+  }
+
+  // Starts gravity acting on sprite at a particular acceleration rate, 
+  // positive acceleration in Y-direction is downwards
+  public void startGravity(float gravityStrength){
+    this.gravityStrength = gravityStrength;
+    startGravity();
+  }
+
+
+  // Stops gravity acting on a Sprite
+  public void stopGravity(){
+    this.hasGravity = false;
+    setAccelerationY(0.0f);
+  }
+
+  // Creates a jump with a specific jumpSpeed at a pre-existing gravityStrength
+  public void jump(float jumpSpeed){
+    setSpeedY(-jumpSpeed);
+    startGravity();
+  }
+
+  // Creates a jump with a specific jumpSpeed and also sets the Sprite's gravity strength
+  public void jump(float jumpSpeed, float gravityStrength){
+    startGravity(gravityStrength);
+    jump(jumpSpeed);
+  }
+
+  // Creates a jump with default jump speed
+  public void jump(){
+    jump(defaultJumpSpeed);
+  }
+
+  // Rotates Sprite image on the screen
   public void rotate(float degrees){
     float rads = p.radians(degrees);
     p.translate(centerX,centerY);
@@ -158,12 +257,12 @@ public class Sprite{
   public void setCenterY(float centerY){
     this.centerY=centerY;
   }
-  
-  
+
+
   /*------------------ SPRITE BOUNDARY METHODS  --------------------
-   * -- Used from Long Bao Nguyen
-   *  -- https://longbaonguyen.github.io/courses/platformer/platformer.html
-   */
+  * -- Used from Long Bao Nguyen
+  *  -- https://longbaonguyen.github.io/courses/platformer/platformer.html
+  */
   void setLeft(float left){
     centerX = left + w/2;
   }
@@ -241,7 +340,7 @@ public class Sprite{
     float w = this.w;
     float h = this.h;
     boolean ia = this.isAnimated;
-    
+
     Sprite sp = new Sprite(p, sif, 1.0f, cx, cy, ia);
     sp.setSpeed(sx,sy);
     sp.setW(w);
@@ -256,15 +355,28 @@ public class Sprite{
   }
 
 
-  // method that automatically moves the Sprite based on its velocity
+  // // method that automatically moves the Sprite based on its velocity
   public void update(){
     move(speedX, speedY);
   }
 
   public void update(float deltaTime){
-    speedX += deltaTime/1000;
-    speedY += deltaTime/1000;
-    move(speedX, speedY);
+
+    // determine number of seconds since last run of update
+    float sec = deltaTime/1000;
+
+    // change speedY if accelY is non-zero OR gravity is on
+    if(hasGravity || Math.signum(accelY) == 0){
+      speedY += accelY*sec;
+    }
+
+    // change speedX if accelX is non-zero
+    if(Math.signum(accelX) == 0){
+      speedX += accelX*sec;
+    }
+
+    // update position based on speed
+    update();
   }
 
   //Method to copy a Sprite to same location
