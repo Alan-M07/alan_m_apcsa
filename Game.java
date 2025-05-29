@@ -39,11 +39,11 @@ public class Game extends PApplet{
   String piece1File = "images/x_wood.png";
   int piece1Row = 3;
   int piece1Col = 0;
-  AnimatedSprite chick;
-  String chickFile = "sprites/chick_walk.png";
-  String chickJson = "sprites/chick_walk.json";
-  int chickRow = 0;
-  int chickCol = 2;
+  AnimatedSprite soren;
+  String sorenFile = "sprites/s=chick_walk.png";
+  String sorenJson = "sprites/chick_walk.json";
+  int sorenRow = 0;
+  int sorenCol = 2;
   int health = 3;
   Button b1;
 
@@ -123,8 +123,8 @@ public class Game extends PApplet{
     //SETUP: Setup more grid1 objects
     piece1 = p.loadImage(piece1File);
     piece1.resize(grid1.getTileWidth(),grid1.getTileHeight());
-    chick = new AnimatedSprite(p, chickFile, chickJson, 0.0f, 0.0f, 0.5f);
-    grid1.setTileSprite(new GridLocation (chickRow, chickCol), chick);
+    soren = new AnimatedSprite(p, sorenFile, sorenJson, 0.0f, 0.0f, 0.5f);
+    grid1.setTileSprite(new GridLocation (sorenRow, sorenCol), soren);
     b1 = new Button(p, "rect", 625, 525, 150, 50, "GoTo Level 2");
     grid1.addSprite(b1);
     // b1.setFontStyle("fonts/spidermanFont.ttf");
@@ -216,11 +216,11 @@ public class Game extends PApplet{
     //KEYS FOR LEVEL1
     if(currentScreen == grid1){
 
-      //set [S] key to move the chick down & avoid Out-of-Bounds errors
-      if(p.keyCode == 83){        
+      //set [S] key to move the soren down & avoid Out-of-Bounds errors
+      if(p.key == 'w'  && sorenRow != 0){        
 
-        //change the field for chickRow
-        chickRow++;
+        //change the field for sorenRow
+        sorenRow--;
       }
 
       // if the 'n' key is pressed, ask for their name
@@ -337,9 +337,9 @@ public class Game extends PApplet{
       GridLocation piece1Loc = new GridLocation(piece1Row,piece1Col);
       grid1.setTileImage(piece1Loc, piece1);
 
-      // Displays the chick image
-      GridLocation chickLoc = new GridLocation(chickRow, chickCol);
-      grid1.setTileSprite(chickLoc, chick);
+      // Displays the soren image
+      GridLocation sorenLoc = new GridLocation(sorenRow, sorenCol);
+      grid1.setTileSprite(sorenLoc, soren);
 
       // Moves to next level based on a button click
       // b1.show();
