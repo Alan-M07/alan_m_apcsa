@@ -181,12 +181,36 @@ public class Game extends PApplet{
     //KEYS FOR LEVEL1
     if(currentScreen == grid1){
 
-      //set [S] key to move the soren down & avoid Out-of-Bounds errors
+      //set [W] key to move the soren up & avoid Out-of-Bounds errors
       if(p.key == 'w'  && sorenRow != 0){        
 
         //change the field for sorenRow
         sorenRow--;
       }
+
+      //set [S] key to move the soren down
+      if(p.key == 'a'  && sorenCol != 0){        
+
+        //change the field for sorenRow
+        sorenCol--;
+      }
+
+      //set [S] key to move the soren down
+            if(p.key == 's'  && sorenRow != grid1.getNumRows()-1){        
+
+        //change the field for sorenRow
+        sorenRow++;
+      }
+
+        //set [S] key to move the soren down
+            if(p.key == 'd'  && sorenCol != grid1.getNumCols()-1){        
+
+        //change the field for sorenRow
+        sorenCol++;
+      }
+
+
+
 
       // if the 'n' key is pressed, ask for their name
       if(p.key == 'n'){
